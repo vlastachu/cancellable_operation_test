@@ -18,6 +18,8 @@ WeakReference<SomeClassForGCTest> getClosuredWeakRef(Future<void> futureToAwait)
   return WeakReference(ref);
 }
 
+
+
 void main(List<String> arguments) async {
   final cancellable = CancelableOperation.fromFuture(Future.delayed(Duration(hours: 1)));
   final weakRef = getClosuredWeakRef(cancellable.value);
@@ -27,6 +29,16 @@ void main(List<String> arguments) async {
   cancellable.cancel();
   await forceGC();
   print(weakRef.target);
+
+  Completer? completer = Completer();
+  final weakRef2 = getClosuredWeakRef(completer.future);
+  await forceGC();
+  print(weakRef2.target);
+
+  completer = null;
+  await forceGC();
+  print(weakRef2.target);
+
 }
 
 /// used to run gc's garbage collection
